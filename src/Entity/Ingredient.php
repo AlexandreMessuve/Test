@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\IngredientRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -30,7 +31,6 @@ class Ingredient
     #[ORM\Column]
     #[Assert\NotNull]
     private ?\DateTimeImmutable $createAt = null;
-
 
     /**
      * Constructor
@@ -78,5 +78,10 @@ class Ingredient
         $this->createAt = $createAt;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }
