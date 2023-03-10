@@ -5,17 +5,54 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarColor02">
+
             <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('ingredient.index') }}">
-                        Ingrédients
+                {% if currentUser is not null %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('ingredient.index') }}">
+                            Ingrédients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('recipe.index') }}">
+                            Recettes
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if currentUser is not null %}
+
+                    {% if currentUser.roles is same as (["ROLE_ADMIN","ROLE_USER"]) %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('admin') }}">
+                                Admin Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                    <a class="nav-link" href="{{ path('security.logout') }}">
+                        Profile
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('recipe.index') }}">
-                        Recettes
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('security.logout') }}">
+                            Deconnexion
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('security.login') }}">
+                            Connexion
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('register') }}">
+                            Inscription
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>

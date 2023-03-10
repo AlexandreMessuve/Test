@@ -25,13 +25,15 @@ class IngredientController extends AbstractController
     #[Route('/ingredient', name: 'ingredient.index', methods: ['GET'])]
     public function index(IngredientRepository $repository, PaginatorInterface $paginator, Request $request): Response
     {
+        $currentUser = $this->getUser();
         $ingredient = $paginator->paginate(
-            $repository->findAll(),
+            $repository->findBy(['user' => $currentUser]),
             $request->query->getInt('page', 1),
             10
         );
         return $this->render('/pages/ingredient/index.html.twig', [
-            'ingredients' => $ingredient
+            'ingredients' => $ingredient,
+            'currentUser' => $currentUser
         ]);
     }
 
@@ -46,12 +48,14 @@ class IngredientController extends AbstractController
         EntityManagerInterface $manager,
     ): Response
     {
+        $currentUser = $this->getUser();
         $ingredient = new Ingredient();
         $form = $this->createForm(IngredientType::class, $ingredient);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $ingredient = $form->getData();
+            $ingredient->setUser($currentUser);
 
             $manager->persist($ingredient);
             $manager->flush();
@@ -64,6 +68,7 @@ class IngredientController extends AbstractController
         }
         return $this->render('/pages/ingredient/new.html.twig', [
             'form' => $form->createView(),
+            'currentUser' => $currentUser
     ]);
     }
 
@@ -81,6 +86,7 @@ class IngredientController extends AbstractController
         EntityManagerInterface $manager
     ): Response
     {
+        $currentUser = $this->getUser();
         $form = $this->createForm(IngredientType::class, $ingredient);
 
         $form->handleRequest($request);
@@ -99,6 +105,7 @@ class IngredientController extends AbstractController
 
         return $this->render('/pages/ingredient/edit.html.twig', [
             'form' => $form->createView(),
+            'currentUser' => $currentUser
         ]);
     }
 

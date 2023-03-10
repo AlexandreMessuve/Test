@@ -28,13 +28,15 @@ class RecipeController extends AbstractController
     #[Route('/recette', name: 'recipe.index', methods: ['GET'])]
     public function index(PaginatorInterface $paginator, RecipeRepository $repository, Request $request): Response
     {
+        $currentUser = $this->getUser();
         $recipes = $paginator->paginate(
-            $repository->findAll(),
+            $repository->findBy(['user' => $currentUser]),
             $request->query->getInt('page', 1),
             10
         );
         return $this->render('/pages/recipe/index.html.twig', [
-            'recipes' => $recipes
+            'recipes' => $recipes,
+            'currentUser' => $currentUser
         ]);
     }
 
@@ -49,12 +51,14 @@ class RecipeController extends AbstractController
     #[Route("/recette/creation", name:"recipe.new" , methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $manager): Response
     {
+        $currentUser = $this->getUser();
         $recipe = new Recipe();
         $form =  $this->createForm(RecipeType::class, $recipe);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $recipe = $form->getData();
+            $recipe->setUser($currentUser);
 
             $manager->persist($recipe);
             $manager->flush();
@@ -68,6 +72,7 @@ class RecipeController extends AbstractController
 
         return $this->render('/pages/recipe/new.html.twig', [
             'form' => $form->createView(),
+            'currentUser' => $currentUser
         ]);
     }
 
@@ -85,6 +90,7 @@ class RecipeController extends AbstractController
         EntityManagerInterface $manager
     ): Response
     {
+        $currentUser = $this->getUser();
         $form = $this->createForm(RecipeType::class, $recipe);
 
         $form->handleRequest($request);
@@ -103,6 +109,7 @@ class RecipeController extends AbstractController
 
         return $this->render('/pages/recipe/edit.html.twig', [
             'form' => $form->createView(),
+            'currentUser' => $currentUser
         ]);
     }
 

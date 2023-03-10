@@ -1,32 +1,18 @@
 {% extends 'base.html.twig' %}
+
+{% block title %}Modification Utilisateur{% endblock %}
+
 {% block body %}
     <div class="container">
-        <h1 class="mt-4">Inscription</h1>
+        <h1 class="mt-4">Modification de l'utilisateur/h1>
         {{ form_start(form) }}
 
-        <div class="form-group">
-            {{ form_label(form.email) }}
-            {{ form_widget(form.email) }}
-            <div class="form-error">
-                {{ form_errors(form.email) }}
-            </div>
-
-        </div>
         <div class="form-group">
             {{ form_label(form.username) }}
             {{ form_widget(form.username) }}
             <div class="form-error">
                 {{ form_errors(form.username) }}
             </div>
-
-        </div>
-        <div class="form-group">
-            {{ form_label(form.password) }}
-            {{ form_widget(form.password) }}
-            <div class="form-error">
-                {{ form_errors(form.password) }}
-            </div>
-        </div>
 
         <div class="form-group">
             {{ form_label(form.nom) }}
@@ -51,16 +37,6 @@
             </div>
         </div>
 
-        <div class="form-check">
-            {{ form_label(form.agreeTerms) }}
-            {{ form_widget(form.agreeTerms) }}
-            <div>
-                {{ form_errors(form.agreeTerms) }}
-            </div>
-        </div>
-
-
-
 
         <div class="form-group d-flex justify-content-center">
             {{ form_row(form.submit) }}
@@ -69,7 +45,4 @@
 
         {{ form_end(form) }}
     </div>
-
-
-
 {% endblock %}

@@ -3,14 +3,25 @@
 {% block title %} Acceuil{% endblock %}
 
 {% block body %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger mt-4 text-center">
+            {{ message }}
+        </div>
+    {% endfor %}
     <div class="container mt-4 ">
-        <div class="jumbotron">
+        <div class="jumbotron text-center">
             <h1 class="display-4">Bienvenue</h1>
             <p class="lead">Ceci est un exemple d'application web</p>
             <hr class="my-4">
-            <p>Pour pouvoir utiliser l'application vous devez vous inscrire, si vous avez déjà un compte cliquez sur le bouton connexion</p>
-            <a class="btn btn-primary btn-lg" href="#" role="button">Connexion</a>
-            <a class="btn btn-primary btn-lg" href="#" role="button">Inscription</a>
+            {% if currentUser is null %}
+                <p>Pour pouvoir utiliser l'application vous devez vous inscrire, si vous avez déjà un compte cliquez sur le bouton connexion</p>
+                <a class="btn btn-primary btn-lg" href="{{path('security.login')}}" role="button">Connexion</a>
+                <a class="btn btn-primary btn-lg" href="{{ path('register') }}" role="button">Inscription</a>
+            {% else %}
+                <p>Vous pouvez ajouter des recettes, et des ingrédients</p>
+                <a class="btn btn-primary btn-lg" href="{{path('recipe.new')}}" role="button">Ajouter une recette</a>
+                <a class="btn btn-primary btn-lg" href="{{ path('ingredient.new') }}" role="button">Ajouter un ingrédient</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

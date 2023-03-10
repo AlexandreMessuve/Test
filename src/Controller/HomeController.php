@@ -10,6 +10,9 @@ class HomeController extends AbstractController
     #[Route('/', 'home.index', methods: ['GET'])]
     public function index(): response
     {
-        return $this->render('/pages/home.html.twig');
+        $currentUser = $this->getUser();
+        return $this->render('/pages/home.html.twig', [
+            'currentUser' => $currentUser
+        ]);
     }
 }

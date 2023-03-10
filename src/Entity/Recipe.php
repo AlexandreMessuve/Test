@@ -61,6 +61,10 @@ class Recipe
     #[ORM\ManyToMany(targetEntity: Ingredient::class, inversedBy: 'recipes')]
     private Collection $ingredientsList;
 
+    #[ORM\ManyToOne(inversedBy: 'recipes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->ingredientsList = new ArrayCollection();
@@ -150,7 +154,7 @@ class Recipe
         return $this;
     }
 
-    public function getIsFavorite(): ?string
+    public function getIsFavorite(): ?bool
     {
         return $this->isFavorite;
     }
@@ -206,6 +210,18 @@ class Recipe
     public function removeIngredientsList(Ingredient $ingredientsList): self
     {
         $this->ingredientsList->removeElement($ingredientsList);
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

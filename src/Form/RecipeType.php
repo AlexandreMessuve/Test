@@ -6,6 +6,7 @@ use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Repository\IngredientRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -20,6 +21,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class RecipeType extends AbstractType
 {
+    private Security $security;
+
+    public function __construct(Security $security){
+        $this->security = $security;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -115,17 +121,22 @@ class RecipeType extends AbstractType
                     'class' => 'form-check-input',
                     ],
                 'required' => false,
-                'label' => 'Ajouter au favorit',
+                'label' => 'Ajouter au favoris',
                 'label_attr' => ['class' => 'form-check-label'],
                 'constraints' => [
                     new Assert\NotNull()
                 ]
             ])
             ->add('ingredientsList', EntityType::class, [
+                'attr' => [
+                    'class' => 'mx-4'
+                ],
                 'class' => Ingredient::class,
                 'query_builder' => function (IngredientRepository $r){
                     return $r->createQueryBuilder('i')
-                        ->orderBy('i.name', 'ASC');
+                        ->where('i.user = :user')
+                        ->orderBy('i.name', 'ASC')
+                        ->setParameter('user', $this->security->getUser());
                 },
                 'choice_label' => 'name',
                 'label' => 'Les ingrédients',

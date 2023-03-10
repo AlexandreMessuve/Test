@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateur{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        {% if not users.items is same as ([]) %}
+            <h1 class="text-center mt-4">Utilisateur</h1>
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success mt-4 text-center">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger mt-4 text-center">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="count">
+                <h4>
+                    Il y a
+                    {{ users.getTotalItemCount }}
+                    utilisateurs
+                </h4>
+            </div>
+
+            <table class="table table-hover mt-4">
+                <thead>
+                <tr class="text-center">
+                    <th scope="col">Email</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prenom</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Date de naissance</th>
+                    <th scope="col">Date de création</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <div class="modal fade" id="infos{{ user.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-bs-dismiss="modal">x</button>
+                                    <h4 class="modal-title">Confirmation</h4>
+                                </div>
+                                <div class="modal-body">
+                                    Etes-vous sur de vouloir supprimer {{ user.nom}} {{ user.prenom}} !
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="{{ path('user.del', {id: user.id}) }}" class="btn btn-primary">OUI</a>
+                                    <a class="btn btn-danger" data-bs-dismiss="modal">NON</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <tr class="table-primary text-center">
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.nom }}</td>
+                        <td>{{ user.prenom }}</td>
+                        <td>{{ user.roles|join(', ') }}</td>
+                        <td>{{ user.dateNaissance | date('d/m/Y') }}</td>
+                        <td>{{ user.createdAt | date('d/m/Y') }}</td>
+                        <td>
+                            <a href="{{ path('user.edit', {id: user.id} ) }}" class="btn btn-info">Modifier</a>
+                            <a data-bs-toggle="modal" data-bs-target="#infos{{ user.id }}" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="navigation d-flex justify-content-center mt-4">
+                {{ knp_pagination_render(users) }}
+            </div>
+        {% else %}
+            <h4>Il n'y a pas d'utilisateur</h4>
+        {% endif %}
+    </div>
+{% endblock %}

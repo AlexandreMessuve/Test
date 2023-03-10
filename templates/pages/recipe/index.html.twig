@@ -15,10 +15,11 @@
                 <h4>
                     Il y a
                     {{ recipes.getTotalItemCount }}
-                    ingredients
+                    recettes
                 </h4>
             </div>
 
+            <a href="{{ path('recipe.new') }}" class="btn btn-success ">Ajouter une recette</a>
             <table class="table table-hover mt-4">
                 <thead>
                 <tr>
