@@ -5,31 +5,20 @@
 {% block body %}
     <div class="container mt-4">
         {% if not ingredients.items is same as ([]) %}
-            <h1>Mes Ingredients</h1>
-
-            <a href="{{ path('ingredient.new') }}" class="btn btn-primary">
-                Créer un ingrédient
-            </a>
             {% for message in app.flashes('success') %}
-                <div class="alert alert-success mt-4">
-                    {{ message }}
+                <div class="text-center alert alert-dismissible  alert-success mt-4">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong>{{ message }}</strong>
                 </div>
             {% endfor %}
-            <div class="count">
-                <h4>
-                    Il y a
-                    {{ ingredients.getTotalItemCount }}
-                    ingredients
-                </h4>
-            </div>
-
+            <h1 class="text-center mb-4">Mes Ingredients({{ ingredients | length }})</h1>
             <table class="table table-hover mt-4">
                 <thead>
                     <tr>
                         <th scope="col">Numéro</th>
                         <th scope="col">Nom</th>
                         <th scope="col">Prix</th>
-                        <th scope="col">Date de création</th>
+                        <th scope="col">Date d'ajout</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -48,11 +37,28 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="text-center">
+                <a href="{{ path('ingredient.new') }}" class="btn btn-primary">
+                    Ajouter un ingrédient
+                </a>
+            </div>
+
             <div class="navigation d-flex justify-content-center mt-4">
                 {{ knp_pagination_render(ingredients) }}
             </div>
         {% else %}
-            <h4>Il n'y a pas d'ingrédient</h4>
+            {% for message in app.flashes('success') %}
+                <div class="text-center alert alert-dismissible  alert-success mt-4">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong>{{ message }}</strong>
+                </div>
+            {% endfor %}
+            <h4 class="text-center">Vous n'avez pas d'ingrédient</h4>
+            <div class="text-center">
+                <a href="{{ path('ingredient.new') }}" class="btn btn-primary">
+                    Ajouter un ingrédient
+                </a>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

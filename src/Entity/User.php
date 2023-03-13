@@ -59,6 +59,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length (max: 50)]
     private ?string $prenom = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $bio = null;
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
@@ -67,6 +69,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Recipe::class, orphanRemoval: true)]
     private Collection $recipes;
+
+
 
 
     public function __construct(){
@@ -323,6 +327,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $recipe->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): self
+    {
+        $this->bio = $bio;
 
         return $this;
     }

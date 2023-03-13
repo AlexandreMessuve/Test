@@ -25,7 +25,7 @@ class UserCrudController extends AbstractCrudController
             IdField::new('id')->onlyOnIndex(),
             EmailField::new('email')->setLabel('Email'),
             TextField::new('username')->setLabel('Pseudo'),
-            TextField::new('plainPassword')->setLabel('Password')->setFormType(PasswordType::class)->onlyOnForms(),
+            TextField::new('plainPassword')->setLabel('Password')->setFormType(PasswordType::class)->onlyWhenCreating(),
             TextField::new('nom')->setLabel('Nom'),
             TextField::new('prenom')->setLabel('Prénom'),
             DateField::new('dateNaissance')->setLabel('Date de naissance'),

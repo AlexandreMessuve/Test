@@ -1,80 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Utilisateur{% endblock %}
+{% block title %}Profil de {{ currentUser.nom | upper }} {{ currentUser.prenom | capitalize}}
+{% endblock %}
+
 
 {% block body %}
+    {% for message in app.flashes('success') %}
+        <div class="text-center alert alert-dismissible  alert-success mt-4">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>{{ message }}</strong>
+        </div>
+    {% endfor %}
     <div class="container mt-4">
-        {% if not users.items is same as ([]) %}
-            <h1 class="text-center mt-4">Utilisateur</h1>
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success mt-4 text-center">
-                    {{ message }}
-                </div>
-            {% endfor %}
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger mt-4 text-center">
-                    {{ message }}
-                </div>
-            {% endfor %}
-            <div class="count">
-                <h4>
-                    Il y a
-                    {{ users.getTotalItemCount }}
-                    utilisateurs
-                </h4>
+        <div class="row mt-xxl-5">
+            <div class="col-2 text-center">
+                <img src="{{ asset('build/img/Jinx_Arcane_6_Render.jpg') }}" height="150px" width="150px" class="rounded-circle">
+                <h4>@{{ currentUser.username }}</h4>
+                <a class="btn btn-info" href="{{ path('user.edit', { id: currentUser.id }) }}">Modifier</a>
+                <a class="btn btn-danger" href="" data-bs-toggle="modal" data-bs-target="#modal">Supprimer</a>
+                <p class="mt-3">Membre depuis:</p>
+                <p>{{ currentUser.createdAt | ago(locale='fr') }}</p>
             </div>
-
-            <table class="table table-hover mt-4">
-                <thead>
-                <tr class="text-center">
-                    <th scope="col">Email</th>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Prenom</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Date de naissance</th>
-                    <th scope="col">Date de création</th>
-                    <th scope="col">Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for user in users %}
-                    <div class="modal fade" id="infos{{ user.id }}">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-bs-dismiss="modal">x</button>
-                                    <h4 class="modal-title">Confirmation</h4>
-                                </div>
-                                <div class="modal-body">
-                                    Etes-vous sur de vouloir supprimer {{ user.nom}} {{ user.prenom}} !
-                                </div>
-                                <div class="modal-footer">
-                                    <a href="{{ path('user.del', {id: user.id}) }}" class="btn btn-primary">OUI</a>
-                                    <a class="btn btn-danger" data-bs-dismiss="modal">NON</a>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-1">
+                <div class="vr" style="height: 100%"></div>
+            </div>
+            <div class="col-8">
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <p>Nom: {{ currentUser.nom | upper }}</p>
+                        <p class="mt-3">Pseudo: {{ currentUser.username | upper }}</p>
                     </div>
-                    <tr class="table-primary text-center">
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.nom }}</td>
-                        <td>{{ user.prenom }}</td>
-                        <td>{{ user.roles|join(', ') }}</td>
-                        <td>{{ user.dateNaissance | date('d/m/Y') }}</td>
-                        <td>{{ user.createdAt | date('d/m/Y') }}</td>
-                        <td>
-                            <a href="{{ path('user.edit', {id: user.id} ) }}" class="btn btn-info">Modifier</a>
-                            <a data-bs-toggle="modal" data-bs-target="#infos{{ user.id }}" class="btn btn-danger">Supprimer</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <div class="navigation d-flex justify-content-center mt-4">
-                {{ knp_pagination_render(users) }}
+
+                    <div class="vr"></div>
+                    <div>
+                        <p>Prénom: {{ currentUser.prenom | capitalize }}</p>
+                        <p class="mt-3">Email: {{ currentUser.email }}</p>
+                    </div>
+
+                </div>
+                <hr>
+                <div>
+                    <p class="text-center">Biograpgie:</p>
+                    <p>{{ currentUser.bio }}</p>
+                </div>
             </div>
-        {% else %}
-            <h4>Il n'y a pas d'utilisateur</h4>
-        {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center" id="modalLabel">Suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center"><strong>Voulez-vous vraiment supprimer votre compte ?</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ path('user.del') }}" type="button" class="btn btn-warning">Supprimer</a>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

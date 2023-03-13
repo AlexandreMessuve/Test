@@ -5,7 +5,9 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,7 +22,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                     'maxlength' => '50'
                 ],
-                'label' => 'Username',
+                'label' => 'Username*',
                 'label_attr' => [
                     'class' => 'label-control'
                 ],
@@ -34,7 +36,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                     'max' => '50'
                 ],
-                'label' => 'Prenom',
+                'label' => 'Prenom*',
                 'label_attr' => ['class' => 'label-control'],
                 'constraints' => [
                     new Assert\Length(['max' => 50]),
@@ -46,7 +48,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                     'max' => '50'
                 ],
-                'label' => 'Nom',
+                'label' => 'Nom*',
                 'label_attr' => ['class' => 'label-control'],
                 'constraints' => [
                     new Assert\Length(['max' => 50]),
@@ -59,8 +61,18 @@ class UserType extends AbstractType
                 ],
                 'widget' => 'single_text',
                 'html5' => true,
-                'label' => 'Date de naissance',
+                'label' => 'Date de naissance*',
                 'label_attr' => ['class' => 'label-control'],
+            ])
+            ->add('bio', TextareaType::class, [
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Votre biographie :'],
+                'label_attr' => ['class' => 'form-label'],
+                'label' => 'Votre biographie'
+            ])
+            ->add('plainPassword', PasswordType::class, [
+                'attr' => ['class' => 'form-control', 'placeholder' => '*********'],
+                'label_attr' => ['class' => 'form-label'],
+                'label' => 'Mot de passe*'
             ])
 
 

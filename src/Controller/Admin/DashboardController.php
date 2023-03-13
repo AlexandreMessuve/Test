@@ -7,6 +7,7 @@ use App\Entity\Recipe;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Locale;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -35,20 +36,6 @@ class DashboardController extends AbstractDashboardController
     public function index(): Response
     {
 
-        if (!$this->getUser())
-        {
-            $this->addFlash('error','Tu n\'es pas connecté');
-            return  $this->redirectToRoute('security.login');
-
-        }
-
-        if ($this->getUser()->getRoles() === ["ROLE_USER"])
-        {
-            $this->addFlash('error','Tu n\'as pas les permissions requis ');
-            return  $this->redirectToRoute('home.index');
-
-        }
-
         $url = $this->adminUrlGenerator->setController(UserCrudController::class)
             ->generateUrl();
 
@@ -58,7 +45,12 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Fil Rouge');
+            ->setTitle('Fil Rouge')
+            ->setLocales([
+                'en',
+                Locale::new('fr', 'français', 'far fa-language')
+            ])
+            ;
     }
 
     public function configureMenuItems(): iterable

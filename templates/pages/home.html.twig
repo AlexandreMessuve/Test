@@ -1,14 +1,22 @@
 {% extends "base.html.twig" %}
 
-{% block title %} Acceuil{% endblock %}
+{% block title %}Acceuil{% endblock %}
 
 {% block body %}
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger mt-4 text-center">
-            {{ message }}
-        </div>
-    {% endfor %}
+
     <div class="container mt-4 ">
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible mt-4 text-center">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible mt-4 text-center">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
         <div class="jumbotron text-center">
             <h1 class="display-4">Bienvenue</h1>
             <p class="lead">Ceci est un exemple d'application web</p>

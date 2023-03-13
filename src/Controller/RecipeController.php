@@ -48,7 +48,7 @@ class RecipeController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response
      */
-    #[Route("/recette/creation", name:"recipe.new" , methods: ['GET', 'POST'])]
+    #[Route("/recette/ajout", name:"recipe.new" , methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $manager): Response
     {
         $currentUser = $this->getUser();

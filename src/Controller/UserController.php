@@ -3,13 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserDeleteType;
 use App\Form\UserType;
-use App\Repository\UserRepository;
+use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
@@ -17,22 +19,22 @@ class UserController extends AbstractController
     /**
     *  Controller user page
      * @param PaginatorInterface $paginator
-     * @param UserRepository $repository
+     * @param RecipeRepository $repository
      * @param Request $request
      * @return Response
      */
     #[Route('/utilisateur', name: 'user.index', methods: ['GET'])]
-    public function index(PaginatorInterface $paginator, UserRepository $repository, Request $request): Response
+    public function index(PaginatorInterface $paginator, RecipeRepository $repository, Request $request): Response
     {
         $currentUser = $this->getUser();
 
-        $users = $paginator->paginate(
-            $repository->findAll(),
+        $recipes = $paginator->paginate(
+            $repository->findBy(['user' => $currentUser]),
             $request->query->getInt('page', 1),
             10
         );
         return $this->render('/pages/user/index.html.twig', [
-            'users' => $users,
+            'recipes' => $recipes,
             'currentUser' => $currentUser
         ]);
     }
@@ -40,41 +42,39 @@ class UserController extends AbstractController
 
     /**
      * Contoller pour edit un utilisateur
-     * @param User $user
+     * @param UserPasswordHasherInterface $hashed
      * @param Request $request
      * @param EntityManagerInterface $manager
      * @return Response
      */
-    #[Route('/utilisateur/edition/{id}', name: 'user.edit')]
-    public function edit(User $user, Request $request, EntityManagerInterface $manager): Response
+    #[Route('/utilisateur/edit', name: 'user.edit')]
+    public function edit(Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hashed): Response
     {
         $currentUser = $this->getUser();
-        if (!$this->getUser()){
-            return $this->redirectToRoute('home.index');
-        }
 
-        if ($this->getUser() !== $user) {
-            $this->addFlash(
-                'error',
-                'Vous ne pouvez pas modifier cette utilisateur'
-            );
-            return $this->redirectToRoute('user.index');
-        }
-
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $currentUser);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()){
-            $user = $form->getData();
-            $manager->persist($user);
-            $manager->flush();
+            $plainPassword = $form->getData()->getplainPassword();
 
-            $this->addFlash(
-                'success',
-                'Utilisateur modifié avec succés'
-            );
-            return $this->redirectToRoute('user.index');
+            if ($hashed->isPasswordValid($currentUser, $plainPassword)){
+                $user = $form->getData();
+                $manager->persist($user);
+                $manager->flush();
+
+                $this->addFlash(
+                    'success',
+                    'Votre profil a bien été modifié'
+                );
+                return $this->redirectToRoute('user.index');
+            }else {
+                $this->addFlash(
+                    'error',
+                    'Impoosible de changer vos données car vous n\'avez pas mis le bon mot de passe'
+                );
+            }
         }
 
         return $this->render('pages/user/edit.html.twig', [
@@ -89,24 +89,19 @@ class UserController extends AbstractController
      * @param User $user
      * @return Response
      */
-    #[Route('//utilisateur/supprimer/{id}', name: 'user.del', methods: ['GET'])]
-    public function delete(EntityManagerInterface $manager, User $user): Response
+    #[Route('/utilisateur/supprimer', name: 'user.del', methods: ['GET' , 'POST'])]
+    public function delete(EntityManagerInterface $manager): Response
     {
-        if ($this->getUser() !== $user) {
-            $this->addFlash(
-                'error',
-                'Vous ne pouvez pas supprimer cette utilisateur'
-            );
-            return $this->redirectToRoute('user.index');
-        }
+        $user = $this->getUser();
+        $this->container->get('security.token_storage')->setToken(null);
         $manager->remove($user);
         $manager->flush();
 
         $this->addFlash(
             'success',
-            'L\'utilisateur a bien été supprimé'
+            'Votre compte a bien été supprimé'
         );
 
-        return $this->redirectToRoute('user.index');
+        return $this->redirectToRoute('home.index');
     }
 }

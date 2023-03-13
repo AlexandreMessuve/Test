@@ -4,7 +4,13 @@
 
 {% block body %}
     <div class="container">
-        <h1 class="mt-4">Modification de l'utilisateur/h1>
+        <h1 class="text-center mt-4">Modification</h1>
+        {% for message in app.flashes('error') %}
+            <div class="text-center alert alert-dismissible  alert-danger mt-4">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
         {{ form_start(form) }}
 
         <div class="form-group">
@@ -13,7 +19,7 @@
             <div class="form-error">
                 {{ form_errors(form.username) }}
             </div>
-
+        </div>
         <div class="form-group">
             {{ form_label(form.nom) }}
             {{ form_widget(form.nom) }}
@@ -30,10 +36,25 @@
             </div>
         </div>
         <div class="form-group">
+            {{ form_label(form.bio) }}
+            {{ form_widget(form.bio) }}
+            <div class="form-error">
+                {{ form_errors(form.bio) }}
+            </div>
+        </div>
+        <div class="form-group">
             {{ form_label(form.dateNaissance) }}
             {{ form_widget(form.dateNaissance) }}
             <div class="form-error">
                 {{ form_errors(form.dateNaissance) }}
+            </div>
+        </div>
+        <p>Vous devez confirmer en mettant votre mot de passe</p>
+        <div class="form-group">
+            {{ form_label(form.plainPassword) }}
+            {{ form_widget(form.plainPassword) }}
+            <div class="form-error">
+                {{ form_errors(form.plainPassword) }}
             </div>
         </div>
 

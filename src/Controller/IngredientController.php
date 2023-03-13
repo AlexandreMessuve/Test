@@ -42,7 +42,7 @@ class IngredientController extends AbstractController
      * @author Alexandre Messuve <alexandre.messuves@gmail.com>
      * @return Response
      */
-    #[Route('/ingredient/nouveau', name:'ingredient.new', methods: ['GET', 'POST'])]
+    #[Route('/ingredient/ajout', name:'ingredient.new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
         EntityManagerInterface $manager,
