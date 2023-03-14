@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Comments;
 use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Entity\User;
@@ -24,11 +25,20 @@ class AppFixtures extends Fixture
                 ->setPrenom($faker->firstName())
                 ->setUsername($faker->username())
                 ->setEmail($faker->email())
+                ->setBio(random_int(0,1) === 1 ? $faker->text(): null)
                 ->setRoles(['ROLE_USER'])
                 ->setPlainPassword('password')
                 ->setDateNaissance(date_create($faker->date()));
             $users[] = $user;
             $manager->persist($user);
+        }
+
+        for ($i = 1; $i <= 50; $i++) {
+            $comments = new Comments();
+            $comments->setContent($faker->realText())
+                    ->setUser($users[random_int(0, count($users) -1)])
+                    ->setAutor($users[random_int(0, count($users) -1)]);
+            $manager->persist($comments);
         }
         //Ingredients
         $ingredients = [];

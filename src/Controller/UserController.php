@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\UserDeleteType;
 use App\Form\UserType;
-use App\Repository\RecipeRepository;
+use App\Repository\CommentsRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,22 +19,23 @@ class UserController extends AbstractController
     /**
     *  Controller user page
      * @param PaginatorInterface $paginator
-     * @param RecipeRepository $repository
+     * @param CommentsRepository $repository
      * @param Request $request
      * @return Response
      */
-    #[Route('/utilisateur', name: 'user.index', methods: ['GET'])]
-    public function index(PaginatorInterface $paginator, RecipeRepository $repository, Request $request): Response
+    #[Route('/utilisateur/{id}', name: 'user.index', methods: ['GET'])]
+    public function index(PaginatorInterface $paginator, CommentsRepository $repository, Request $request, User $user): Response
     {
         $currentUser = $this->getUser();
 
-        $recipes = $paginator->paginate(
-            $repository->findBy(['user' => $currentUser]),
+        $comments = $paginator->paginate(
+            $repository->findBy(['user' => $user],['createdAt' => 'DESC']),
             $request->query->getInt('page', 1),
-            10
+            5
         );
         return $this->render('/pages/user/index.html.twig', [
-            'recipes' => $recipes,
+            'user' => $user,
+            'comments' => $comments,
             'currentUser' => $currentUser
         ]);
     }
@@ -47,7 +48,7 @@ class UserController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response
      */
-    #[Route('/utilisateur/edit', name: 'user.edit')]
+    #[Route('/utilisateur/edit', name: 'user.edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hashed): Response
     {
         $currentUser = $this->getUser();
@@ -56,10 +57,10 @@ class UserController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->getData()->getplainPassword();
 
-            if ($hashed->isPasswordValid($currentUser, $plainPassword)){
+            if ($hashed->isPasswordValid($currentUser, $plainPassword)) {
                 $user = $form->getData();
                 $manager->persist($user);
                 $manager->flush();
@@ -69,24 +70,85 @@ class UserController extends AbstractController
                     'Votre profil a bien été modifié'
                 );
                 return $this->redirectToRoute('user.index');
-            }else {
+            } else {
                 $this->addFlash(
                     'error',
                     'Impoosible de changer vos données car vous n\'avez pas mis le bon mot de passe'
                 );
             }
         }
-
         return $this->render('pages/user/edit.html.twig', [
+            'currentUser' => $currentUser,
             'form' => $form->createView(),
-            'currentUser' => $currentUser
         ]);
     }
+    #[Route('/utilisateur/editpass', name: 'user.edit.pass', methods: ['GET', 'POST'])]
+    public function editPass(Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hashed): Response
+        {
+            $currentUser = $this->getUser();
 
+            if ($request->isMethod('POST')){
+                if ($hashed->isPasswordValid($currentUser, $request->request->get('plainPassword'))){
+                    if ($request->request->get('password') === $request->request->get('passwordVerify')){
+                        if ($request->request->get('password') !== $request->request->get('plainPassword')){
+                            $hashedPass =  $hashed->hashPassword($currentUser ,$request->request->get('password'));
+                            $currentUser->setPassword($hashedPass);
+                            $manager->persist($currentUser);
+                            $manager->flush();
+                            $this->addFlash('success', 'Mot de passe modifié avec succès');
+                            return $this->redirectToRoute('user.index');
+                        } else {
+                            $this->addFlash('error', 'Vous ne pouvez pas remettre le même mot de passe');
+                        }
+
+
+                    }else{
+                        $this->addFlash('error', 'Nouveau mot de passe non identique avec le confirme');
+                    }
+                }else{
+                    $this->addFlash(
+                        'error',
+                        'Ancien mot de passe incorrect'
+                    );
+                }
+            }
+
+
+            return $this->render('pages/user/editpass.html.twig', [
+                'currentUser' => $currentUser
+            ]);
+
+        }
+
+    /**
+     * @param Request $request
+     * @param UserRepository $repository
+     * @param PaginatorInterface $paginator
+     * @return Response
+     */
+
+    /**
+     * @param Request $request
+     * @param UserRepository $repository
+     * @param PaginatorInterface $paginator
+     * @return Response
+     */
+    #[Route('/utilisateur', name: 'user.list', methods: ['GET'])]
+    public function userList(UserRepository $repository, Request $request, PaginatorInterface $paginator): Response
+    {
+        $users = $paginator->paginate(
+            $repository->findAll(),
+            $request->query->getInt('page', 1),
+            6
+        );
+        return $this->render('pages/user/list.html.twig',[
+            'users' => $users,
+            'currentUser' => $this->getUser()
+        ]);
+    }
     /**
      * Controller pour supprimer un utilisateur
      * @param EntityManagerInterface $manager
-     * @param User $user
      * @return Response
      */
     #[Route('/utilisateur/supprimer', name: 'user.del', methods: ['GET' , 'POST'])]

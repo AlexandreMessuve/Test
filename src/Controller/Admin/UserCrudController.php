@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -28,8 +29,9 @@ class UserCrudController extends AbstractCrudController
             TextField::new('plainPassword')->setLabel('Password')->setFormType(PasswordType::class)->onlyWhenCreating(),
             TextField::new('nom')->setLabel('Nom'),
             TextField::new('prenom')->setLabel('Prénom'),
-            DateField::new('dateNaissance')->setLabel('Date de naissance'),
-            DateField::new('createdAt')->setLabel('Date de création')->onlyOnIndex(),
+            DateField::new('dateNaissance')->setLabel('Date de naissance')->setFormat('dd MMM Y')->setTimezone('Europe/Paris'),
+            ArrayField::new('roles')->setLabel('Role')->hideWhenCreating(),
+            DateField::new('createdAt')->setLabel('Date de création')->onlyOnIndex()->setFormat('dd MMM Y HH:mm')->setTimezone('Europe/Paris'),
         ];
     }
 

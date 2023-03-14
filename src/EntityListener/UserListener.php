@@ -35,6 +35,6 @@ class UserListener
                 $user,
                 $user->getPlainPassword()
             )
-        );
+        )->setPlainPassword(null);
     }
 }
